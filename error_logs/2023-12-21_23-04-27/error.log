@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python310\lib\site-packages\botasaurus\decorators.py", line 366, in run_task
+    result = func(driver, data)
+  File "C:\Users\Dell\Desktop\New folder\scrapper\src\scraper.py", line 292, in scrape_places
+    sponsored_links = get_sponsored_links()
+  File "C:\Users\Dell\Desktop\New folder\scrapper\src\scraper.py", line 200, in get_sponsored_links
+    sponsored_links = driver.execute_file('get_sponsored_links.js')
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python310\lib\site-packages\botasaurus\anti_detect_driver.py", line 364, in execute_file
+    content = read_file(filename)
+  File "C:\Users\Dell\AppData\Local\Programs\Python\Python310\lib\site-packages\botasaurus\utils.py", line 256, in read_file
+    with open(path, 'r', encoding="utf-8") as fp:
+FileNotFoundError: [Errno 2] No such file or directory: 'get_sponsored_links.js'

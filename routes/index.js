@@ -8,6 +8,9 @@ const { promisify } = require('util');
 
 
 router.get('/', async (req, res) => {
+  const searchTerm = 'swimming coaching and training academies in india';
+
+
   const extractItems = async (page) => {
     return await page.evaluate(() => {
       return Array.from(document.querySelectorAll(".Nv2PK")).map((el) => {
@@ -67,6 +70,8 @@ router.get('/', async (req, res) => {
     let previousHeight = await page.evaluate(`document.querySelector("${scrollContainer}").scrollHeight`);
 
     for (let scrollCount = 0; scrollCount < maxScrolls; scrollCount++) {
+      console.log(`Getting Data from Page - ${scrollCount}`)
+      console.log("")
       const newItems = await extractItems(page);
       items = [...items, ...newItems];
 
@@ -107,21 +112,22 @@ router.get('/', async (req, res) => {
     for (let i = 0; i < data.length; i++) {
 
       console.log("================ LOG INFO ================")
-      console.log(`total records- (${data.length})`)
+      console.log(`total records - (${data.length})`)
       console.log(`completed records- (${i + 1})`)
       console.log("")
       const reverseGeocodeResult = await getReverseGeocode(data[i].latitude, data[i].longitude);
-      data[i]['house_number'] = reverseGeocodeResult.house_number;
-      data[i]['road'] = reverseGeocodeResult.road;
-      data[i]['neighbourhood'] = reverseGeocodeResult.neighbourhood;
-      data[i]['suburb'] = reverseGeocodeResult.suburb;
-      data[i]['county'] = reverseGeocodeResult.county;
-      data[i]['state_district'] = reverseGeocodeResult.state_district;
-      data[i]['state'] = reverseGeocodeResult.state;
-      data[i]['state'] = reverseGeocodeResult.state;
-      data[i]['postcode'] = reverseGeocodeResult.postcode;
-      data[i]['country'] = reverseGeocodeResult.country;
-      data[i]['country_code'] = reverseGeocodeResult.country_code;
+      if (!reverseGeocodeResult)
+      data[i]['house_number'] = reverseGeocodeResult && (reverseGeocodeResult.house_number != null && reverseGeocodeResult.house_number !== undefined) ? reverseGeocodeResult.house_number : "";
+      data[i]['road'] = reverseGeocodeResult && (reverseGeocodeResult.road != null && reverseGeocodeResult.road !== undefined) ? reverseGeocodeResult.road : "";
+      data[i]['neighbourhood'] = reverseGeocodeResult && (reverseGeocodeResult.neighbourhood != null && reverseGeocodeResult.neighbourhood !== undefined) ? reverseGeocodeResult.neighbourhood : "";
+      data[i]['suburb'] = reverseGeocodeResult && (reverseGeocodeResult.suburb != null && reverseGeocodeResult.suburb !== undefined) ? reverseGeocodeResult.suburb : "";
+      data[i]['county'] = reverseGeocodeResult && (reverseGeocodeResult.county != null && reverseGeocodeResult.county !== undefined) ? reverseGeocodeResult.county : "";
+      data[i]['state_district'] = reverseGeocodeResult && (reverseGeocodeResult.state_district != null && reverseGeocodeResult.state_district !== undefined) ? reverseGeocodeResult.state_district : "";
+      data[i]['state'] = reverseGeocodeResult && (reverseGeocodeResult.state != null && reverseGeocodeResult.state !== undefined) ? reverseGeocodeResult.state : "";
+      data[i]['postcode'] = reverseGeocodeResult && (reverseGeocodeResult.postcode != null && reverseGeocodeResult.postcode !== undefined) ? reverseGeocodeResult.postcode : "";
+      data[i]['country'] = reverseGeocodeResult && (reverseGeocodeResult.country != null && reverseGeocodeResult.country !== undefined) ? reverseGeocodeResult.country : "";
+      data[i]['country_code'] = reverseGeocodeResult && (reverseGeocodeResult.country_code != null && reverseGeocodeResult.country_code !== undefined) ? reverseGeocodeResult.country_code : "";
+      
       if (i + 1 == data.length) {
         CreateExcel(data)
       }
@@ -155,14 +161,13 @@ router.get('/', async (req, res) => {
     // Promisify the write function
     const writeFileAsync = promisify(wb.write).bind(wb);
     try {
-      const formattedSearchTerm = searchTerm.replace(/ /g, '_');
-const currentDate = new Date();
-const formattedDate = currentDate.toISOString().replace(/:/g, '-').split('.')[0];
-const fileName = `ExcelFile_${formattedSearchTerm}_${formattedDate}.xlsx`;
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString().replace(/:/g, '-').split('.')[0];
+      const fileName = `ExcelFile_${searchTerm}_${formattedDate}.xlsx`;
 
 
       await writeFileAsync(`${fileName}.xlsx`);
-      console.log('Excel file saved successfully!');
+      console.log(`Excel file saved successfully!(${fileName})`);
     } catch (err) {
       console.error(err);
     }

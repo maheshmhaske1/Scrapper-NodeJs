@@ -7,9 +7,15 @@ const { promisify } = require('util');
 
 
 
-router.get('/', async (req, res) => {
+router.post('/get-data', async (req, res) => {
   // const searchTerm = 'swimming coaching and training academies in india';
-  const searchTerm = 'cricket coaching and academies in pune';
+  const { searchTerm } = req.body
+  if (!searchTerm) {
+    return res.json({
+      status: false,
+      message: "Please provide searchTerm"
+    })
+  }
 
 
   const extractItems = async (page) => {
@@ -87,11 +93,14 @@ router.get('/', async (req, res) => {
 
 
   const getMapsData = async () => {
+
+    // ============== Headless Mode(LOCAL) ============== //
     // const browser = await puppeteer.launch({
     //   headless: true,
     //   args: ["--disabled-setuid-sandbox", "--no-sandbox"],
     // });
 
+    // ============== Headless Mode(PRODUCTION) ============== //
     const browser = await puppeteer.launch({
       executablePath: '/usr/bin/chromium-browser'
     })
@@ -121,7 +130,7 @@ router.get('/', async (req, res) => {
       console.log("")
       const reverseGeocodeResult = await getReverseGeocode(data[i].latitude, data[i].longitude);
       if (!reverseGeocodeResult)
-      data[i]['house_number'] = reverseGeocodeResult && (reverseGeocodeResult.house_number != null && reverseGeocodeResult.house_number !== undefined) ? reverseGeocodeResult.house_number : "";
+        data[i]['house_number'] = reverseGeocodeResult && (reverseGeocodeResult.house_number != null && reverseGeocodeResult.house_number !== undefined) ? reverseGeocodeResult.house_number : "";
       data[i]['road'] = reverseGeocodeResult && (reverseGeocodeResult.road != null && reverseGeocodeResult.road !== undefined) ? reverseGeocodeResult.road : "";
       data[i]['neighbourhood'] = reverseGeocodeResult && (reverseGeocodeResult.neighbourhood != null && reverseGeocodeResult.neighbourhood !== undefined) ? reverseGeocodeResult.neighbourhood : "";
       data[i]['suburb'] = reverseGeocodeResult && (reverseGeocodeResult.suburb != null && reverseGeocodeResult.suburb !== undefined) ? reverseGeocodeResult.suburb : "";
@@ -131,8 +140,8 @@ router.get('/', async (req, res) => {
       data[i]['postcode'] = reverseGeocodeResult && (reverseGeocodeResult.postcode != null && reverseGeocodeResult.postcode !== undefined) ? reverseGeocodeResult.postcode : "";
       data[i]['country'] = reverseGeocodeResult && (reverseGeocodeResult.country != null && reverseGeocodeResult.country !== undefined) ? reverseGeocodeResult.country : "";
       data[i]['country_code'] = reverseGeocodeResult && (reverseGeocodeResult.country_code != null && reverseGeocodeResult.country_code !== undefined) ? reverseGeocodeResult.country_code : "";
-      
-      if (i + 1 == 10) {
+
+      if (i + 1 == data.length) {
         CreateExcel(data)
       }
     }
@@ -167,11 +176,15 @@ router.get('/', async (req, res) => {
     try {
       const currentDate = new Date();
       const formattedDate = currentDate.toISOString().replace(/:/g, '-').split('.')[0];
-      const fileName = `ExcelFile_${searchTerm}_${formattedDate}.xlsx`;
+      const fileName = `EXL_${searchTerm}_${formattedDate}.xlsx`;
 
 
       await writeFileAsync(`${fileName}.xlsx`);
-      console.log(`Excel file saved successfully!(${fileName})`);
+
+      return res.json({
+        success: true,
+        message: `Excel file saved successfully!(${fileName})`,
+      })
     } catch (err) {
       console.error(err);
     }

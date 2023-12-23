@@ -8,7 +8,8 @@ const { promisify } = require('util');
 
 
 router.get('/', async (req, res) => {
-  const searchTerm = 'swimming coaching and training academies in india';
+  // const searchTerm = 'swimming coaching and training academies in india';
+  const searchTerm = 'cricket coaching and academies in pune';
 
 
   const extractItems = async (page) => {
@@ -100,7 +101,6 @@ router.get('/', async (req, res) => {
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4882.194 Safari/537.36",
     });
 
-    const searchTerm = 'swimming coaching and training academies in india';
     const encodedSearchTerm = encodeURIComponent(searchTerm);
 
     await page.goto(`https://www.google.com/maps/search/${encodedSearchTerm}`, {
@@ -132,7 +132,7 @@ router.get('/', async (req, res) => {
       data[i]['country'] = reverseGeocodeResult && (reverseGeocodeResult.country != null && reverseGeocodeResult.country !== undefined) ? reverseGeocodeResult.country : "";
       data[i]['country_code'] = reverseGeocodeResult && (reverseGeocodeResult.country_code != null && reverseGeocodeResult.country_code !== undefined) ? reverseGeocodeResult.country_code : "";
       
-      if (i + 1 == data.length) {
+      if (i + 1 == 10) {
         CreateExcel(data)
       }
     }

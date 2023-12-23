@@ -86,10 +86,14 @@ router.get('/', async (req, res) => {
 
 
   const getMapsData = async () => {
+    // const browser = await puppeteer.launch({
+    //   headless: true,
+    //   args: ["--disabled-setuid-sandbox", "--no-sandbox"],
+    // });
+
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--disabled-setuid-sandbox", "--no-sandbox"],
-    });
+      executablePath: '/usr/bin/chromium-browser'
+    })
 
     const [page] = await browser.pages();
     await page.setExtraHTTPHeaders({
